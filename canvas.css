@@ -31,15 +31,6 @@ body {
     overflow-y: scroll;
 }
 div.container{
-    scroll-snap-align: start;
-    color: salmon;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100vw;
-    height: 100vh;
-}
-div.container{
     background: transparent;
 }
 div.container h1{
@@ -52,11 +43,19 @@ div.container h1{
     word-break: break-all;
 }
 div.toolbar{
-    background: blue;
-    
-    margin-left: 100vw;
-    margin-right: 100vw;
-    margin-top: 12vh;
+    background-image: linear-gradient(180deg, #c5e2f6, #c5e2f6 , #c5e2f6, #c5e2f6, #c5e2f6,#c5e2f6,#c5e2f6,#c5e2f6,#c5e2f6,#c5e2f6,#31383d);
+    width: 100vw;
+    height: 15vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+img.logo{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 20vw;
+    height: 80%;
 }
 h1{
     font-family: arial, serif;
