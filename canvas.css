@@ -30,7 +30,7 @@ body {
     scroll-snap-type: y mandatory;
     overflow-y: scroll;
 }
-div.container section {
+div.container{
     scroll-snap-align: start;
     color: salmon;
     display: flex;
@@ -39,16 +39,26 @@ div.container section {
     width: 100vw;
     height: 100vh;
 }
-div.container section.one{
+div.container{
     background: transparent;
 }
-div.container section.three{
-    background: gray;
+div.container h1{
+    margin: 20px;
+    margin-top: 15px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 4em;
+    word-break: break-all;
 }
-div.container section.two{
-    background: burlywood;
+div.toolbar{
+    background: blue;
+    
+    margin-left: 100vw;
+    margin-right: 100vw;
+    margin-top: 12vh;
 }
 h1{
     font-family: arial, serif;
-    font-size: 12em;
+    font-size: 6em;
 }

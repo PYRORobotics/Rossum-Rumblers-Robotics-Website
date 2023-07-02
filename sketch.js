@@ -7,10 +7,11 @@ canvas.height = window.innerHeight;
 var centerX = canvas.width * 0.75; // X-coordinate of the center of the circle
 var centerY = canvas.height * 0.5; // Y-coordinate of the center of the circle
 var radius = canvas.width * 0.25; // Radius of the circle
+var starColor = "rgb(255,255,255)"
 
 var stars = [], // Array that contains the stars
     FPS = 60, // Frames per second
-    x = 1200; // Number of stars
+    x = 300; // Number of stars
 
 // Push stars to array
 for (var i = 0; i < x; i++) {
@@ -31,114 +32,61 @@ for (var i = 0; i < x; i++) {
 }
 
 // Draw the scene
+var g = 0.01
+
+
+var glowAngle = 0; // initial angle for the glowing segment
 
 function draw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.globalCompositeOperation = "source-over"; // This makes sure that the glow effect doesn't affect the stars
 
-  ctx.globalCompositeOperation = "lighter";
-
+  // Draw stars
   for (var i = 0, n = stars.length; i < n; i++) {
     var s = stars[i];
-
-    ctx.fillStyle = "#fff";
+    if (g < 1) {
+      ctx.fillStyle = "rgba(255, 255, 255, " + g + ")";
+      g = g * 1.00002;
+    } else {
+      ctx.fillStyle = "rgba(255, 255, 255, 1)";
+    }
     ctx.beginPath();
     ctx.arc(s.x, s.y, s.radius, 0, 2 * Math.PI);
     ctx.fill();
-    ctx.fillStyle = 'black';
+  }
+
+  // Draw glowing ring segment with a fading trail
+  for (var i = 0; i < 180; i++) { // Increase the iterations for a longer trail
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, glowAngle - i * 0.01, glowAngle - i * 0.01 + Math.PI / 24, false); // Adjust the range to make the line shorter
+    ctx.arc(centerX, centerY, radius, glowAngle - i * 0.01 + Math.PI / 24, glowAngle - i * 0.01, true); // Draw a second arc in the opposite direction to create a rounded tip
+    ctx.strokeStyle = 'rgba(255, 255, 255, ' + (1 - i * 0.005) + ')'; // Decrease the opacity change for a smoother fade
+    ctx.lineWidth = i == 0 ? 5 : 2; // Adjust this to make the trail thinner
+    ctx.shadowColor = 'white';
+    ctx.shadowBlur = 20 - i * 0.1; // Reduce the shadowBlur value for each segment to make the glow shrink
     ctx.stroke();
+    ctx.shadowBlur = 0; // Reset the blur effect so it doesn't affect other drawings
   }
 
-  ctx.beginPath();
-  for (var i = 0, x = stars.length; i < x; i++) {
-    var starI = stars[i];
-    ctx.moveTo(starI.x,starI.y); 
-    for (var j = 0, x = stars.length; j < x; j++) {
-      var starII = stars[j];
-      if(distance(starI, starII) < 150 && !intersects(starI, starII)) {
-        //ctx.globalAlpha = (1 / 150 * distance(starI, starII).toFixed(1));
-        ctx.lineTo(starII.x,starII.y); 
-      }
-    }
+  // Update the angle for the next frame
+  glowAngle += 0.01;
+  if (glowAngle > Math.PI * 2) {
+    glowAngle -= Math.PI * 2;
   }
-  ctx.lineWidth = 0.05;
-  ctx.strokeStyle = 'white';
-  ctx.stroke();
 }
 
-function distance( line, point ){
-  var xs = 0;
-  var ys = 0;
 
-  xs = line.x2 - line.x1;
-  xs = xs * xs;
 
-  ys = line.y2 - line.y1;
-  ys = ys * ys;
 
-  var u = ((point.x - line.x1) * (line.x2 - line.x1) + (point.y - line.y1) * (line.y2 - line.y1)) / (xs + ys);
 
-  if (u > 1) {
-    u = 1;
-  } else if (u < 0) {
-    u = 0;
-  }
-
-  var x = line.x1 + u * (line.x2 - line.x1);
-  var y = line.y1 + u * (line.y2 - line.y1);
-
-  var dx = x - point.x;
-  var dy = y - point.y;
-
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-function intersects(line1, line2) {
-  // Check if the two lines share an endpoint
-  if ((line1.x1 === line2.x1 && line1.y1 === line2.y1) || (line1.x2 === line2.x2 && line1.y2 === line2.y2)) {
-    return true;
-    }
-    // Check if the two lines intersect
-var d1 = distance(line2, {x: line1.x1, y: line1.y1});
-var d2 = distance(line2, {x: line1.x2, y: line1.y2});
-var d3 = distance(line1, {x: line2.x1, y: line2.y1});
-var d4 = distance(line1, {x: line2.x2, y: line2.y2});
-
-if (d1 < 1 || d2 < 1 || d3 < 1 || d4 < 1) {
-return true;
-}1
-
-if ((line1.x1 < line2.x1 && line1.x2 < line2.x1) ||
-(line1.x1 > line2.x2 && line1.x2 > line2.x2) ||
-(line1.y1 < line2.y1 && line1.y2 < line2.y1) ||
-(line1.y1 > line2.y2 && line1.y2 > line2.y2)) {
-return false;
-}
-
-var slope1 = (line1.y2 - line1.y1) / (line1.x2 - line1.x1);
-var slope2 = (line2.y2 - line2.y1) / (line2.x2 - line2.x1);
-
-if (slope1 === slope2) {
-return false;
-}
-
-var yIntercept1 = line1.y1 - slope1 * line1.x1;
-var yIntercept2 = line2.y1 - slope2 * line2.x1;
-
-var intersectionX = (yIntercept2 - yIntercept1) / (slope1 - slope2);
-var intersectionY = slope1 * intersectionX + yIntercept1;
-
-if ((intersectionX < Math.min(line1.x1, line1.x2) || intersectionX > Math.max(line1.x1, line1.x2)) ||
-(intersectionX < Math.min(line2.x1, line2.x2) || intersectionX > Math.max(line2.x1, line2.x2)) ||
-(intersectionY < Math.min(line1.y1, line1.y2) || intersectionY > Math.max(line1.y1, line1.y2)) ||
-(intersectionY < Math.min(line2.y1, line2.y2) || intersectionY > Math.max(line2.y1, line2.y2))) {
-return false;
-}
-
-return true;
-}
-
+var j = 0;
 // Update star locations
+
 function update() {
+  if( j < 1) {
+  radius = canvas.width * (.25 * j);
+  j += .001;
+  }
   for (var i = 0; i < stars.length; i++) {
     var star = stars[i];
     star.x += star.vx / FPS;
